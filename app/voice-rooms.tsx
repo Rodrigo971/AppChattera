@@ -1,4 +1,6 @@
+import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -75,16 +77,15 @@ export default function VoiceRoomsScreen() {
   }, []);
 
   const openRoom = (item: Room) => {
-    console.log('ABRIENDO SALA:', item.id, item.title);
-
     router.push({
-  pathname: '/room',
-  params: {
-    roomId: String(item.id),
-    title: item.title || 'Sala',
-  },
-});
-}
+      pathname: '/room',
+      params: {
+        roomId: String(item.id),
+        title: item.title || 'Sala',
+      },
+    });
+  };
+
   const renderRoom = ({ item, index }: { item: Room; index: number }) => (
     <Pressable style={styles.roomCard} onPress={() => openRoom(item)}>
       <View style={styles.roomGlow} />
@@ -92,20 +93,21 @@ export default function VoiceRoomsScreen() {
       <View style={styles.roomTop}>
         <View style={styles.avatarStack}>
           <View style={[styles.avatarCircle, styles.avatarOne]}>
-            <Text style={styles.avatarText}>🎙️</Text>
+            <Ionicons name="mic" size={18} color="#151000" />
           </View>
 
           <View style={[styles.avatarCircle, styles.avatarTwo]}>
-            <Text style={styles.avatarText}>🔥</Text>
+            <Ionicons name="flame" size={18} color="#151000" />
           </View>
 
           <View style={[styles.avatarCircle, styles.avatarThree]}>
-            <Text style={styles.avatarText}>💎</Text>
+            <Ionicons name="diamond" size={17} color="#151000" />
           </View>
         </View>
 
-        <View style={styles.hotBadge}>
-          <Text style={styles.hotBadgeText}>
+        <View style={styles.livePill}>
+          <View style={styles.liveDot} />
+          <Text style={styles.livePillText}>
             {index === 0 ? 'TOP LIVE' : 'EN VIVO'}
           </Text>
         </View>
@@ -116,17 +118,35 @@ export default function VoiceRoomsScreen() {
       </Text>
 
       <Text numberOfLines={2} style={styles.roomDescription}>
-        Únete a la conversación, conoce gente nueva y participa en la sala.
+        Entrá, hablá en vivo, conocé gente nueva y destacá dentro de Chattera.
       </Text>
 
+      <View style={styles.roomStats}>
+        <View style={styles.statItem}>
+          <Ionicons name="radio" size={14} color="#FFD38A" />
+          <Text style={styles.statText}>Sala activa</Text>
+        </View>
+
+        <View style={styles.statItem}>
+          <Ionicons name="gift" size={14} color="#FFD38A" />
+          <Text style={styles.statText}>Gifts</Text>
+        </View>
+
+        <View style={styles.statItem}>
+          <Ionicons name="trophy" size={14} color="#FFD38A" />
+          <Text style={styles.statText}>Ranking</Text>
+        </View>
+      </View>
+
       <View style={styles.roomBottom}>
-        <View style={styles.liveInfo}>
-          <Text style={styles.liveDot}>●</Text>
-          <Text style={styles.liveText}>Sala activa</Text>
+        <View>
+          <Text style={styles.createdText}>Chattera Live</Text>
+          <Text style={styles.roomStatus}>Disponible ahora</Text>
         </View>
 
         <View style={styles.enterButton}>
           <Text style={styles.enterText}>Entrar</Text>
+          <Ionicons name="chevron-forward" size={16} color="#151000" />
         </View>
       </View>
     </Pressable>
@@ -134,16 +154,17 @@ export default function VoiceRoomsScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.glowPink} />
-      <View style={styles.glowPurple} />
-      <View style={styles.glowBlue} />
+      <StatusBar style="light" />
+
+      <View style={styles.goldGlowTop} />
+      <View style={styles.goldGlowBottom} />
 
       <View style={styles.header}>
         <View>
           <Text style={styles.kicker}>CHATTERA LIVE</Text>
           <Text style={styles.title}>Salas de voz</Text>
           <Text style={styles.subtitle}>
-            Habla, conoce gente y sube en el ranking
+            Entrá a salas en vivo, hablá y brillá.
           </Text>
         </View>
 
@@ -151,7 +172,7 @@ export default function VoiceRoomsScreen() {
           style={styles.createCircle}
           onPress={() => router.push('/create-room')}
         >
-          <Text style={styles.createCircleText}>＋</Text>
+          <Ionicons name="add" size={30} color="#151000" />
         </Pressable>
       </View>
 
@@ -165,26 +186,30 @@ export default function VoiceRoomsScreen() {
         </View>
 
         <View style={styles.heroRight}>
-          <Text style={styles.heroIcon}>👑</Text>
-          <View style={styles.liveBadge}>
-            <Text style={styles.liveBadgeText}>● LIVE</Text>
+          <View style={styles.crownCircle}>
+            <Ionicons name="diamond" size={32} color="#FFD38A" />
+          </View>
+
+          <View style={styles.heroLiveBadge}>
+            <View style={styles.greenDot} />
+            <Text style={styles.heroLiveText}>LIVE</Text>
           </View>
         </View>
       </View>
 
       <View style={styles.quickRow}>
         <View style={styles.quickCard}>
-          <Text style={styles.quickIcon}>🎁</Text>
-          <Text style={styles.quickText}>Gifts</Text>
+          <Ionicons name="gift" size={22} color="#FFD38A" />
+          <Text style={styles.quickText}>Regalos</Text>
         </View>
 
         <View style={styles.quickCard}>
-          <Text style={styles.quickIcon}>🏆</Text>
+          <Ionicons name="trophy" size={22} color="#FFD38A" />
           <Text style={styles.quickText}>Ranking</Text>
         </View>
 
         <View style={styles.quickCard}>
-          <Text style={styles.quickIcon}>💬</Text>
+          <Ionicons name="chatbubbles" size={22} color="#FFD38A" />
           <Text style={styles.quickText}>Chat</Text>
         </View>
       </View>
@@ -192,14 +217,15 @@ export default function VoiceRoomsScreen() {
       <View style={styles.sectionRow}>
         <Text style={styles.sectionTitle}>Disponibles ahora</Text>
 
-        <Pressable onPress={onRefresh}>
+        <Pressable style={styles.refreshButton} onPress={onRefresh}>
+          <Ionicons name="refresh" size={14} color="#FFD38A" />
           <Text style={styles.refreshText}>Actualizar</Text>
         </Pressable>
       </View>
 
       {loading ? (
         <View style={styles.loadingBox}>
-          <ActivityIndicator color="#ec4899" size="large" />
+          <ActivityIndicator color="#D9A85C" size="large" />
           <Text style={styles.loadingText}>Cargando salas...</Text>
         </View>
       ) : (
@@ -213,21 +239,26 @@ export default function VoiceRoomsScreen() {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={onRefresh}
-              tintColor="#ec4899"
+              tintColor="#D9A85C"
             />
           }
           ListEmptyComponent={
             <View style={styles.emptyBox}>
-              <Text style={styles.emptyIcon}>🎧</Text>
+              <View style={styles.emptyIconCircle}>
+                <Ionicons name="headset" size={38} color="#FFD38A" />
+              </View>
+
               <Text style={styles.emptyTitle}>No hay salas activas</Text>
+
               <Text style={styles.emptyText}>
-                Crea una sala y empieza una conversación en vivo.
+                Crea una sala premium y empieza una conversación en vivo.
               </Text>
 
               <Pressable
                 style={styles.emptyButton}
                 onPress={() => router.push('/create-room')}
               >
+                <Ionicons name="add-circle" size={18} color="#151000" />
                 <Text style={styles.emptyButtonText}>Crear primera sala</Text>
               </Pressable>
             </View>
@@ -238,39 +269,35 @@ export default function VoiceRoomsScreen() {
   );
 }
 
+const GOLD = '#D9A85C';
+const GOLD_LIGHT = '#FFD38A';
+const DARK = '#07090D';
+const CARD = '#111318';
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#050514',
+    backgroundColor: DARK,
     paddingHorizontal: 16,
-    paddingTop: 32,
+    paddingTop: 48,
   },
-  glowPink: {
+  goldGlowTop: {
+    position: 'absolute',
+    width: 280,
+    height: 280,
+    borderRadius: 140,
+    backgroundColor: 'rgba(217, 168, 92, 0.16)',
+    top: -80,
+    right: -110,
+  },
+  goldGlowBottom: {
     position: 'absolute',
     width: 260,
     height: 260,
     borderRadius: 130,
-    backgroundColor: 'rgba(236, 72, 153, 0.28)',
-    top: 20,
-    left: -120,
-  },
-  glowPurple: {
-    position: 'absolute',
-    width: 300,
-    height: 300,
-    borderRadius: 150,
-    backgroundColor: 'rgba(124, 58, 237, 0.23)',
-    top: 120,
-    right: -130,
-  },
-  glowBlue: {
-    position: 'absolute',
-    width: 250,
-    height: 250,
-    borderRadius: 125,
-    backgroundColor: 'rgba(34, 211, 238, 0.13)',
-    bottom: 40,
-    left: -100,
+    backgroundColor: 'rgba(255, 211, 138, 0.08)',
+    bottom: 30,
+    left: -110,
   },
   header: {
     flexDirection: 'row',
@@ -279,89 +306,101 @@ const styles = StyleSheet.create({
     marginBottom: 18,
   },
   kicker: {
-    color: '#f472b6',
+    color: GOLD_LIGHT,
     fontSize: 12,
     fontWeight: '900',
-    letterSpacing: 1.3,
-    marginBottom: 4,
+    letterSpacing: 1.4,
+    marginBottom: 5,
   },
   title: {
     color: '#ffffff',
-    fontSize: 30,
+    fontSize: 31,
     fontWeight: '900',
+    letterSpacing: 0.3,
   },
   subtitle: {
-    color: '#c4b5fd',
+    color: '#B8A66F',
     fontSize: 13,
     fontWeight: '700',
-    marginTop: 4,
+    marginTop: 5,
     maxWidth: 250,
   },
   createCircle: {
-    width: 52,
-    height: 52,
+    width: 54,
+    height: 54,
     borderRadius: 20,
-    backgroundColor: '#ec4899',
+    backgroundColor: GOLD,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: '#f9a8d4',
-    shadowColor: '#ec4899',
-    shadowOpacity: 0.5,
-    shadowRadius: 12,
-    elevation: 8,
-  },
-  createCircleText: {
-    color: '#fff',
-    fontSize: 30,
-    fontWeight: '900',
-    marginTop: -2,
+    borderWidth: 1,
+    borderColor: GOLD_LIGHT,
+    shadowColor: GOLD,
+    shadowOpacity: 0.45,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 7 },
+    elevation: 10,
   },
   heroCard: {
-    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+    backgroundColor: CARD,
     borderRadius: 28,
     padding: 18,
     borderWidth: 1,
-    borderColor: 'rgba(236, 72, 153, 0.45)',
+    borderColor: 'rgba(217,168,92,0.35)',
     marginBottom: 14,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
   heroSmall: {
-    color: '#f9a8d4',
+    color: GOLD_LIGHT,
     fontSize: 12,
     fontWeight: '900',
     marginBottom: 4,
   },
   heroNumber: {
-    color: '#facc15',
-    fontSize: 38,
+    color: GOLD_LIGHT,
+    fontSize: 40,
     fontWeight: '900',
   },
   heroLabel: {
-    color: '#e2e8f0',
+    color: '#E8E8E8',
     fontSize: 13,
     fontWeight: '800',
   },
   heroRight: {
     alignItems: 'center',
   },
-  heroIcon: {
-    fontSize: 42,
+  crownCircle: {
+    width: 64,
+    height: 64,
+    borderRadius: 24,
+    backgroundColor: '#17120B',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#5A3D1D',
     marginBottom: 8,
   },
-  liveBadge: {
-    backgroundColor: 'rgba(34, 197, 94, 0.17)',
-    borderColor: '#22c55e',
+  heroLiveBadge: {
+    backgroundColor: 'rgba(68, 209, 122, 0.12)',
+    borderColor: '#44D17A',
     borderWidth: 1,
     borderRadius: 999,
-    paddingHorizontal: 12,
-    paddingVertical: 7,
+    paddingHorizontal: 11,
+    paddingVertical: 6,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
   },
-  liveBadgeText: {
-    color: '#22c55e',
-    fontSize: 12,
+  greenDot: {
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+    backgroundColor: '#44D17A',
+  },
+  heroLiveText: {
+    color: '#44D17A',
+    fontSize: 11,
     fontWeight: '900',
   },
   quickRow: {
@@ -371,21 +410,18 @@ const styles = StyleSheet.create({
   },
   quickCard: {
     flex: 1,
-    backgroundColor: 'rgba(30, 41, 59, 0.78)',
+    backgroundColor: '#111318',
     borderRadius: 18,
-    paddingVertical: 12,
+    paddingVertical: 13,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(148, 163, 184, 0.22)',
-  },
-  quickIcon: {
-    fontSize: 21,
-    marginBottom: 5,
+    borderColor: '#242018',
   },
   quickText: {
     color: '#fff',
     fontSize: 12,
     fontWeight: '900',
+    marginTop: 6,
   },
   sectionRow: {
     flexDirection: 'row',
@@ -398,9 +434,20 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: '900',
   },
+  refreshButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    backgroundColor: '#17120B',
+    borderWidth: 1,
+    borderColor: '#5A3D1D',
+    paddingHorizontal: 11,
+    paddingVertical: 7,
+    borderRadius: 999,
+  },
   refreshText: {
-    color: '#f472b6',
-    fontSize: 13,
+    color: GOLD_LIGHT,
+    fontSize: 12,
     fontWeight: '900',
   },
   loadingBox: {
@@ -408,20 +455,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingText: {
-    color: '#cbd5e1',
+    color: '#B8B8B8',
     fontSize: 13,
     fontWeight: '700',
     marginTop: 12,
   },
   listContent: {
-    paddingBottom: 32,
+    paddingBottom: 34,
   },
   roomCard: {
-    backgroundColor: 'rgba(15, 23, 42, 0.94)',
-    borderRadius: 26,
+    backgroundColor: CARD,
+    borderRadius: 27,
     padding: 16,
     borderWidth: 1,
-    borderColor: 'rgba(236, 72, 153, 0.26)',
+    borderColor: 'rgba(217,168,92,0.28)',
     marginBottom: 14,
     overflow: 'hidden',
   },
@@ -430,7 +477,7 @@ const styles = StyleSheet.create({
     width: 150,
     height: 150,
     borderRadius: 75,
-    backgroundColor: 'rgba(236, 72, 153, 0.16)',
+    backgroundColor: 'rgba(217, 168, 92, 0.12)',
     right: -50,
     top: -45,
   },
@@ -444,53 +491,81 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   avatarCircle: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
+    width: 43,
+    height: 43,
+    borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
-    borderColor: '#fff',
+    borderColor: '#111318',
   },
   avatarOne: {
-    backgroundColor: '#7c3aed',
+    backgroundColor: GOLD_LIGHT,
   },
   avatarTwo: {
-    backgroundColor: '#ec4899',
+    backgroundColor: '#E8B866',
     marginLeft: -10,
   },
   avatarThree: {
-    backgroundColor: '#22d3ee',
+    backgroundColor: '#D9A85C',
     marginLeft: -10,
   },
-  avatarText: {
-    fontSize: 18,
-  },
-  hotBadge: {
-    backgroundColor: 'rgba(250, 204, 21, 0.15)',
-    borderColor: '#facc15',
+  livePill: {
+    backgroundColor: 'rgba(255, 211, 138, 0.12)',
+    borderColor: GOLD_LIGHT,
     borderWidth: 1,
     borderRadius: 999,
     paddingHorizontal: 10,
     paddingVertical: 6,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
-  hotBadgeText: {
-    color: '#facc15',
+  liveDot: {
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+    backgroundColor: '#44D17A',
+  },
+  livePillText: {
+    color: GOLD_LIGHT,
     fontSize: 11,
     fontWeight: '900',
   },
   roomTitle: {
     color: '#fff',
-    fontSize: 18,
+    fontSize: 19,
     fontWeight: '900',
-    marginTop: 14,
+    marginTop: 15,
   },
   roomDescription: {
-    color: '#cbd5e1',
+    color: '#B8B8B8',
     fontSize: 13,
     fontWeight: '600',
     lineHeight: 19,
     marginTop: 6,
+  },
+  roomStats: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 14,
+  },
+  statItem: {
+    backgroundColor: '#17120B',
+    borderWidth: 1,
+    borderColor: '#3A2A16',
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+  },
+  statText: {
+    color: '#D8D8D8',
+    fontSize: 11,
+    fontWeight: '800',
   },
   roomBottom: {
     flexDirection: 'row',
@@ -498,65 +573,75 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 16,
   },
-  liveInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  liveDot: {
-    color: '#22c55e',
-    fontSize: 11,
-    marginRight: 6,
-  },
-  liveText: {
-    color: '#cbd5e1',
+  createdText: {
+    color: GOLD_LIGHT,
     fontSize: 12,
-    fontWeight: '800',
+    fontWeight: '900',
+  },
+  roomStatus: {
+    color: '#8F8F8F',
+    fontSize: 12,
+    fontWeight: '700',
+    marginTop: 3,
   },
   enterButton: {
-    backgroundColor: '#ec4899',
+    backgroundColor: GOLD,
     borderRadius: 999,
-    paddingHorizontal: 17,
-    paddingVertical: 9,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
   },
   enterText: {
-    color: '#fff',
+    color: '#151000',
     fontSize: 13,
     fontWeight: '900',
   },
   emptyBox: {
     marginTop: 55,
     alignItems: 'center',
-    backgroundColor: 'rgba(15, 23, 42, 0.88)',
-    borderRadius: 26,
+    backgroundColor: CARD,
+    borderRadius: 28,
     padding: 24,
     borderWidth: 1,
-    borderColor: 'rgba(236, 72, 153, 0.25)',
+    borderColor: 'rgba(217,168,92,0.28)',
   },
-  emptyIcon: {
-    fontSize: 44,
-    marginBottom: 10,
+  emptyIconCircle: {
+    width: 72,
+    height: 72,
+    borderRadius: 28,
+    backgroundColor: '#17120B',
+    borderWidth: 1,
+    borderColor: '#5A3D1D',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 14,
   },
   emptyTitle: {
     color: '#fff',
-    fontSize: 19,
+    fontSize: 20,
     fontWeight: '900',
   },
   emptyText: {
-    color: '#cbd5e1',
+    color: '#B8B8B8',
     fontSize: 13,
     textAlign: 'center',
-    marginTop: 7,
+    marginTop: 8,
     lineHeight: 19,
   },
   emptyButton: {
-    backgroundColor: '#ec4899',
+    backgroundColor: GOLD,
     paddingHorizontal: 17,
     paddingVertical: 12,
     borderRadius: 16,
-    marginTop: 17,
+    marginTop: 18,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 7,
   },
   emptyButtonText: {
-    color: '#fff',
+    color: '#151000',
     fontSize: 13,
     fontWeight: '900',
   },

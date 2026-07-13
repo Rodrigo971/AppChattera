@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   Image,
   Pressable,
   ScrollView,
@@ -55,6 +56,27 @@ export default function HomeScreen() {
     }
   };
 
+  const handleLogout = async () => {
+    Alert.alert(
+      'Cerrar sesión',
+      '¿Seguro que quieres salir de Chattera?',
+      [
+        {
+          text: 'Cancelar',
+          style: 'cancel',
+        },
+        {
+          text: 'Salir',
+          style: 'destructive',
+          onPress: async () => {
+            await supabase.auth.signOut();
+            router.replace('/login');
+          },
+        },
+      ]
+    );
+  };
+
   useEffect(() => {
     loadProfile();
   }, []);
@@ -73,7 +95,10 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scroll}
+      >
         <View style={styles.header}>
           <View>
             <Text style={styles.title}>Chattera</Text>
@@ -105,11 +130,17 @@ export default function HomeScreen() {
             </View>
           </View>
 
-          <Pressable style={styles.coinBox} onPress={() => router.push('/coins')}>
-            <Ionicons name="logo-bitcoin" size={17} color="#FFD38A" />
-            <Text style={styles.coins}>{profile?.coins ?? 0}</Text>
-            <Ionicons name="add-circle" size={23} color="#D9A85C" />
-          </Pressable>
+          <View style={styles.rightActions}>
+            <Pressable style={styles.coinBox} onPress={() => router.push('/coins')}>
+              <Ionicons name="logo-bitcoin" size={17} color="#FFD38A" />
+              <Text style={styles.coins}>{profile?.coins ?? 0}</Text>
+              <Ionicons name="add-circle" size={23} color="#D9A85C" />
+            </Pressable>
+
+            <Pressable style={styles.logoutMiniButton} onPress={handleLogout}>
+              <Ionicons name="log-out-outline" size={18} color="#FFD38A" />
+            </Pressable>
+          </View>
         </View>
 
         <View style={styles.quickGrid}>
@@ -119,41 +150,6 @@ export default function HomeScreen() {
           <HomeAction icon="gift" label="Regalos" route="/shop" />
           <HomeAction icon="trophy" label="Logros" route="/achievements" />
         </View>
-
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Salas Populares</Text>
-          <Pressable onPress={() => router.push('/voice-rooms')}>
-            <Text style={styles.seeAll}>Ver todas</Text>
-          </Pressable>
-        </View>
-
-        <RoomCard
-          image="https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=300"
-          title="Chill & Talk"
-          subtitle="Conversación"
-          people={128}
-        />
-
-        <RoomCard
-          image="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300"
-          title="Música 24/7"
-          subtitle="Escuchando"
-          people={96}
-        />
-
-        <RoomCard
-          image="https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=300"
-          title="Charla Random"
-          subtitle="Conversando"
-          people={73}
-        />
-
-        <RoomCard
-          image="https://images.unsplash.com/photo-1542751371-adc38448a05e?w=300"
-          title="Juegos & Friends"
-          subtitle="Jugando"
-          people={62}
-        />
 
         <View style={styles.premiumBox}>
           <Ionicons name="sparkles" size={26} color="#FFD38A" />
@@ -199,34 +195,6 @@ function HomeAction({
   );
 }
 
-function RoomCard({
-  image,
-  title,
-  subtitle,
-  people,
-}: {
-  image: string;
-  title: string;
-  subtitle: string;
-  people: number;
-}) {
-  return (
-    <Pressable style={styles.roomCard} onPress={() => router.push('/voice-rooms')}>
-      <Image source={{ uri: image }} style={styles.roomImage} />
-
-      <View style={{ flex: 1 }}>
-        <Text style={styles.roomTitle}>{title}</Text>
-        <Text style={styles.roomSubtitle}>{subtitle}</Text>
-      </View>
-
-      <View style={styles.peopleBox}>
-        <Ionicons name="person" size={13} color="#FFD38A" />
-        <Text style={styles.peopleText}>{people}</Text>
-      </View>
-    </Pressable>
-  );
-}
-
 function TabButton({
   icon,
   label,
@@ -241,7 +209,9 @@ function TabButton({
   return (
     <Pressable style={styles.tabButton} onPress={() => router.push(route as any)}>
       <Ionicons name={icon} size={21} color={active ? '#FFD38A' : '#777'} />
-      <Text style={[styles.tabText, active && styles.tabTextActive]}>{label}</Text>
+      <Text style={[styles.tabText, active && styles.tabTextActive]}>
+        {label}
+      </Text>
     </Pressable>
   );
 }
@@ -354,6 +324,10 @@ const styles = StyleSheet.create({
     color: '#44D17A',
     fontSize: 12,
   },
+  rightActions: {
+    alignItems: 'center',
+    gap: 10,
+  },
   coinBox: {
     alignItems: 'center',
     gap: 3,
@@ -362,6 +336,16 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 13,
     fontWeight: '700',
+  },
+  logoutMiniButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 14,
+    backgroundColor: '#17120B',
+    borderWidth: 1,
+    borderColor: '#5A3D1D',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   quickGrid: {
     marginTop: 18,
@@ -383,59 +367,8 @@ const styles = StyleSheet.create({
     fontSize: 11,
     marginTop: 7,
   },
-  sectionHeader: {
-    marginTop: 28,
-    marginBottom: 12,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  sectionTitle: {
-    color: '#fff',
-    fontSize: 19,
-    fontWeight: '800',
-  },
-  seeAll: {
-    color: '#D9A85C',
-    fontSize: 13,
-  },
-  roomCard: {
-    backgroundColor: '#111318',
-    borderRadius: 22,
-    padding: 12,
-    marginBottom: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#232018',
-  },
-  roomImage: {
-    width: 52,
-    height: 52,
-    borderRadius: 17,
-    marginRight: 12,
-  },
-  roomTitle: {
-    color: '#fff',
-    fontSize: 15,
-    fontWeight: '800',
-  },
-  roomSubtitle: {
-    color: '#9A9A9A',
-    fontSize: 12,
-    marginTop: 3,
-  },
-  peopleBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  peopleText: {
-    color: '#FFD38A',
-    fontSize: 13,
-    fontWeight: '700',
-  },
   premiumBox: {
-    marginTop: 12,
+    marginTop: 24,
     backgroundColor: '#17120B',
     borderRadius: 24,
     padding: 16,

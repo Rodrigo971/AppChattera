@@ -3,21 +3,20 @@ import * as Clipboard from 'expo-clipboard';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import {
-    ActivityIndicator,
-    Alert,
-    Image,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    View,
+  ActivityIndicator,
+  Alert,
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from 'react-native';
 import {
-    createFollowNotificationOnce,
-    createProfileViewNotificationOnce,
+  createFollowNotificationOnce,
+  createProfileViewNotificationOnce,
 } from '../lib/notifications';
 import { supabase } from '../lib/supabase';
-
 
 type ProfileData = {
   id: string;
@@ -41,45 +40,45 @@ export default function UserProfileScreen() {
   const [followLoading, setFollowLoading] = useState(false);
 
   const registerProfileView = async (viewerId: string, viewedUserId: string) => {
-  try {
-    if (!viewerId || !viewedUserId || viewerId === viewedUserId) return;
+    try {
+      if (!viewerId || !viewedUserId || viewerId === viewedUserId) return;
 
-    const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString();
+      const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString();
 
-    const { data: existingView, error: existingError } = await supabase
-      .from('profile_views')
-      .select('id')
-      .eq('viewer_id', viewerId)
-      .eq('viewed_user_id', viewedUserId)
-      .gte('created_at', tenMinutesAgo)
-      .maybeSingle();
+      const { data: existingView, error: existingError } = await supabase
+        .from('profile_views')
+        .select('id')
+        .eq('viewer_id', viewerId)
+        .eq('viewed_user_id', viewedUserId)
+        .gte('created_at', tenMinutesAgo)
+        .maybeSingle();
 
-    if (existingError) {
-      console.log('Error verificando visita previa:', existingError.message);
-      return;
-    }
-
-    if (!existingView) {
-      const { error: insertError } = await supabase.from('profile_views').insert({
-        viewer_id: viewerId,
-        viewed_user_id: viewedUserId,
-      });
-
-      if (insertError) {
-        console.log('Error registrando visita al perfil:', insertError.message);
+      if (existingError) {
+        console.log('Error verificando visita previa:', existingError.message);
         return;
       }
-    }
 
-    await createProfileViewNotificationOnce({
-      userId: viewedUserId,
-      actorId: viewerId,
-      relatedUserId: viewerId,
-    });
-  } catch (error) {
-    console.log('Error inesperado registrando visita:', error);
-  }
-};
+      if (!existingView) {
+        const { error: insertError } = await supabase.from('profile_views').insert({
+          viewer_id: viewerId,
+          viewed_user_id: viewedUserId,
+        });
+
+        if (insertError) {
+          console.log('Error registrando visita al perfil:', insertError.message);
+          return;
+        }
+      }
+
+      await createProfileViewNotificationOnce({
+        userId: viewedUserId,
+        actorId: viewerId,
+        relatedUserId: viewerId,
+      });
+    } catch (error) {
+      console.log('Error inesperado registrando visita:', error);
+    }
+  };
 
   const loadFollowStats = async (targetUserId: string, currentUserId: string) => {
     try {
@@ -220,10 +219,10 @@ export default function UserProfileScreen() {
         setFollowersCount((prev) => prev + 1);
 
         await createFollowNotificationOnce({
-  userId: profile.id,
-  actorId: myUserId,
-  relatedUserId: myUserId,
-});
+          userId: profile.id,
+          actorId: myUserId,
+          relatedUserId: myUserId,
+        });
       }
     } catch (error) {
       console.log('Error siguiendo/dejando de seguir:', error);
@@ -231,6 +230,32 @@ export default function UserProfileScreen() {
     } finally {
       setFollowLoading(false);
     }
+  };
+
+  const handleLogout = async () => {
+    Alert.alert(
+      'Cerrar sesión',
+      '¿Seguro que quieres salir de Chattera?',
+      [
+        {
+          text: 'Cancelar',
+          style: 'cancel',
+        },
+        {
+          text: 'Salir',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await supabase.auth.signOut();
+              router.replace('/login');
+            } catch (error) {
+              console.log('Error cerrando sesión:', error);
+              Alert.alert('Error', 'No se pudo cerrar sesión');
+            }
+          },
+        },
+      ]
+    );
   };
 
   const formatLastSeen = (dateString?: string | null) => {
@@ -261,7 +286,7 @@ export default function UserProfileScreen() {
   if (loading) {
     return (
       <View style={styles.loading}>
-        <ActivityIndicator size="large" color="#8b5cf6" />
+        <ActivityIndicator size="large" color="#D9A85C" />
         <Text style={styles.loadingText}>Cargando perfil...</Text>
       </View>
     );
@@ -396,9 +421,15 @@ export default function UserProfileScreen() {
         )}
 
         {isMyOwnProfile && (
-          <View style={styles.ownProfileBadge}>
-            <Text style={styles.ownProfileBadgeText}>Este es tu perfil</Text>
-          </View>
+          <>
+            <View style={styles.ownProfileBadge}>
+              <Text style={styles.ownProfileBadgeText}>Este es tu perfil</Text>
+            </View>
+
+            <Pressable style={styles.logoutButton} onPress={handleLogout}>
+              <Text style={styles.logoutButtonText}>Cerrar sesión</Text>
+            </Pressable>
+          </>
         )}
       </View>
     </ScrollView>
@@ -408,7 +439,7 @@ export default function UserProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0b0f1a',
+    backgroundColor: '#07090D',
   },
   content: {
     padding: 20,
@@ -416,18 +447,18 @@ const styles = StyleSheet.create({
   },
   loading: {
     flex: 1,
-    backgroundColor: '#0b0f1a',
+    backgroundColor: '#07090D',
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
   },
   loadingText: {
-    color: '#94a3b8',
+    color: '#B8A37A',
     fontSize: 14,
     marginTop: 12,
   },
   emptyText: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontSize: 16,
   },
   backButton: {
@@ -435,52 +466,56 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   back: {
-    color: '#a78bfa',
+    color: '#FFD38A',
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   card: {
-    backgroundColor: '#12182a',
-    borderRadius: 22,
+    backgroundColor: '#10131A',
+    borderRadius: 24,
     padding: 24,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#1f2940',
+    borderColor: '#2B2418',
   },
   avatar: {
     width: 140,
     height: 140,
     borderRadius: 70,
     marginBottom: 16,
+    borderWidth: 2,
+    borderColor: '#D9A85C',
   },
   avatarFallback: {
     width: 140,
     height: 140,
     borderRadius: 70,
-    backgroundColor: '#8b5cf6',
+    backgroundColor: '#17120B',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16,
+    borderWidth: 2,
+    borderColor: '#D9A85C',
   },
   avatarLetter: {
-    color: '#fff',
+    color: '#FFD38A',
     fontSize: 46,
-    fontWeight: '800',
+    fontWeight: '900',
   },
   username: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontSize: 24,
-    fontWeight: '800',
+    fontWeight: '900',
     marginBottom: 6,
   },
   presence: {
-    color: '#94a3b8',
+    color: '#B8A37A',
     fontSize: 14,
     marginBottom: 14,
   },
   presenceOnline: {
-    color: '#4ade80',
-    fontWeight: '700',
+    color: '#4ADE80',
+    fontWeight: '800',
   },
   statsRow: {
     width: '100%',
@@ -490,33 +525,33 @@ const styles = StyleSheet.create({
   },
   statBox: {
     flex: 1,
-    backgroundColor: '#0f1424',
+    backgroundColor: '#0B0D12',
     borderRadius: 16,
     paddingVertical: 14,
     paddingHorizontal: 12,
     borderWidth: 1,
-    borderColor: '#232d45',
+    borderColor: '#2B2418',
     alignItems: 'center',
   },
   statNumber: {
-    color: '#fff',
+    color: '#FFD38A',
     fontSize: 20,
-    fontWeight: '800',
+    fontWeight: '900',
     marginBottom: 4,
   },
   statLabel: {
-    color: '#94a3b8',
+    color: '#B8A37A',
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   userIdBox: {
     width: '100%',
-    backgroundColor: '#0f1424',
+    backgroundColor: '#0B0D12',
     borderRadius: 16,
     paddingVertical: 12,
     paddingHorizontal: 14,
     borderWidth: 1,
-    borderColor: '#232d45',
+    borderColor: '#2B2418',
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 16,
@@ -526,35 +561,35 @@ const styles = StyleSheet.create({
     paddingRight: 10,
   },
   userIdLabel: {
-    color: '#94a3b8',
+    color: '#B8A37A',
     fontSize: 13,
     marginBottom: 4,
   },
   userIdValue: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontSize: 12,
     fontWeight: '700',
   },
   copyButton: {
-    backgroundColor: '#8b5cf6',
+    backgroundColor: '#D9A85C',
     borderRadius: 12,
     paddingVertical: 10,
     paddingHorizontal: 14,
   },
   copyButtonText: {
-    color: '#fff',
+    color: '#17120B',
     fontSize: 13,
-    fontWeight: '800',
+    fontWeight: '900',
   },
   bio: {
-    color: '#d1d5db',
+    color: '#E5E0D6',
     fontSize: 15,
     textAlign: 'center',
     marginBottom: 22,
     lineHeight: 22,
   },
   bioEmpty: {
-    color: '#6b7280',
+    color: '#756B5A',
     fontSize: 14,
     textAlign: 'center',
     marginBottom: 22,
@@ -565,48 +600,65 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   followButton: {
-    backgroundColor: '#8b5cf6',
+    backgroundColor: '#D9A85C',
     borderRadius: 14,
     paddingVertical: 14,
     paddingHorizontal: 24,
   },
   followingButton: {
-    backgroundColor: '#374151',
+    backgroundColor: '#2A241A',
   },
   followButtonText: {
-    color: '#fff',
+    color: '#17120B',
     textAlign: 'center',
-    fontWeight: '800',
+    fontWeight: '900',
     fontSize: 16,
   },
   messageButton: {
-    backgroundColor: '#1f2937',
+    backgroundColor: '#17120B',
+    borderWidth: 1,
+    borderColor: '#D9A85C',
     borderRadius: 14,
     paddingVertical: 14,
     paddingHorizontal: 24,
   },
   messageButtonText: {
-    color: '#fff',
+    color: '#FFD38A',
     textAlign: 'center',
-    fontWeight: '800',
+    fontWeight: '900',
     fontSize: 16,
   },
   buttonDisabled: {
     opacity: 0.7,
   },
   ownProfileBadge: {
-    backgroundColor: '#1b2338',
+    backgroundColor: '#17120B',
     borderWidth: 1,
-    borderColor: '#2b3550',
+    borderColor: '#2B2418',
     borderRadius: 14,
     paddingVertical: 12,
     paddingHorizontal: 18,
     minWidth: 180,
+    marginBottom: 12,
   },
   ownProfileBadgeText: {
-    color: '#c4b5fd',
+    color: '#FFD38A',
     textAlign: 'center',
-    fontWeight: '700',
+    fontWeight: '800',
     fontSize: 14,
+  },
+  logoutButton: {
+    width: '100%',
+    backgroundColor: '#1A0F0F',
+    borderWidth: 1,
+    borderColor: '#D9A85C',
+    borderRadius: 16,
+    paddingVertical: 15,
+  },
+  logoutButtonText: {
+    color: '#FFD38A',
+    textAlign: 'center',
+    fontSize: 16,
+    fontWeight: '900',
   },
 });

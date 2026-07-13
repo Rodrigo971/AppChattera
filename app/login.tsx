@@ -1,13 +1,13 @@
-import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import {
   Alert,
-  Animated,
+  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -19,30 +19,6 @@ export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-
-  const glow = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(glow, {
-          toValue: 1,
-          duration: 1600,
-          useNativeDriver: true,
-        }),
-        Animated.timing(glow, {
-          toValue: 0,
-          duration: 1600,
-          useNativeDriver: true,
-        }),
-      ])
-    ).start();
-  }, []);
-
-  const logoScale = glow.interpolate({
-    inputRange: [0, 1],
-    outputRange: [1, 1.07],
-  });
 
   const handleLogin = async () => {
     if (!email.trim() || !password.trim()) {
@@ -73,150 +49,311 @@ export default function LoginScreen() {
   };
 
   return (
-    <LinearGradient colors={['#05040a', '#11101c', '#05040a']} style={styles.container}>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
       <StatusBar style="light" />
 
-      <KeyboardAvoidingView
-        style={styles.content}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      <View style={styles.glowTop} />
+      <View style={styles.glowBottom} />
+
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
       >
-        <Animated.View style={[styles.logo, { transform: [{ scale: logoScale }] }]}>
-          <Text style={styles.logoText}>C</Text>
-        </Animated.View>
-
-        <Text style={styles.brand}>Chattera</Text>
-        <Text style={styles.subtitle}>Conectá con personas en vivo</Text>
-
         <View style={styles.card}>
-          <Text style={styles.title}>Iniciar sesión</Text>
+          <View style={styles.logoWrapper}>
+            <Image
+              source={require('../assets/images/chattera-logo.png')}
+              style={styles.logo}
+              resizeMode="cover"
+            />
+          </View>
 
-          <TextInput
-            placeholder="Correo electrónico"
-            placeholderTextColor="#9b8b64"
-            style={styles.input}
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-            autoCorrect={false}
-            keyboardType="email-address"
-            editable={!loading}
-          />
+          <Text style={styles.title}>CHATTERA</Text>
+          <Text style={styles.subtitle}>
+            Entrá a tu cuenta y conectate con tu comunidad
+          </Text>
 
-          <TextInput
-            placeholder="Contraseña"
-            placeholderTextColor="#9b8b64"
-            secureTextEntry
-            style={styles.input}
-            value={password}
-            onChangeText={setPassword}
-            autoCapitalize="none"
-            autoCorrect={false}
-            editable={!loading}
-          />
+          <View style={styles.formSection}>
+            <Text style={styles.inputLabel}>Correo electrónico</Text>
 
-          <Pressable onPress={handleLogin} disabled={loading} style={styles.buttonWrap}>
-            <LinearGradient colors={['#ffe28a', '#d6a935', '#8f5f10']} style={styles.button}>
-              <Text style={styles.buttonText}>{loading ? 'Entrando...' : 'Entrar'}</Text>
-            </LinearGradient>
-          </Pressable>
+            <TextInput
+              placeholder="tu@email.com"
+              placeholderTextColor="#746B5A"
+              style={styles.input}
+              value={email}
+              onChangeText={setEmail}
+              autoCapitalize="none"
+              autoCorrect={false}
+              keyboardType="email-address"
+              editable={!loading}
+            />
 
-          <Pressable onPress={() => router.replace('/register')} disabled={loading}>
-            <Text style={styles.link}>
-              ¿No tienes cuenta? <Text style={styles.linkGold}>Regístrate</Text>
+            <Text style={styles.inputLabel}>Contraseña</Text>
+
+            <TextInput
+              placeholder="Ingresá tu contraseña"
+              placeholderTextColor="#746B5A"
+              secureTextEntry
+              style={styles.input}
+              value={password}
+              onChangeText={setPassword}
+              autoCapitalize="none"
+              autoCorrect={false}
+              editable={!loading}
+              onSubmitEditing={handleLogin}
+              returnKeyType="done"
+            />
+          </View>
+
+          <Pressable
+            style={({ pressed }) => [
+              styles.primaryButton,
+              pressed && styles.primaryButtonPressed,
+              loading && styles.disabledButton,
+            ]}
+            onPress={handleLogin}
+            disabled={loading}
+          >
+            <Text style={styles.primaryButtonText}>
+              {loading ? 'Entrando...' : 'Iniciar sesión'}
             </Text>
           </Pressable>
+
+          <View style={styles.dividerRow}>
+            <View style={styles.divider} />
+            <Text style={styles.dividerText}>CHATERA PREMIUM</Text>
+            <View style={styles.divider} />
+          </View>
+
+          <Pressable
+            style={({ pressed }) => [
+              styles.registerButton,
+              pressed && styles.registerButtonPressed,
+            ]}
+            onPress={() => router.replace('/register')}
+            disabled={loading}
+          >
+            <Text style={styles.registerText}>
+              ¿No tenés una cuenta?
+            </Text>
+            <Text style={styles.goldText}> Crear cuenta</Text>
+          </Pressable>
         </View>
-      </KeyboardAvoidingView>
-    </LinearGradient>
+
+        <Text style={styles.footerText}>
+          Chattera · conversaciones, salas y comunidad
+        </Text>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
+const GOLD = '#F5C542';
+const GOLD_LIGHT = '#FFD978';
+const DARK = '#08080F';
+const CARD = '#121220';
+
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  content: {
+  container: {
     flex: 1,
+    backgroundColor: DARK,
+  },
+
+  scrollContent: {
+    flexGrow: 1,
     justifyContent: 'center',
+    paddingHorizontal: 22,
+    paddingVertical: 38,
+  },
+
+  glowTop: {
+    position: 'absolute',
+    width: 320,
+    height: 320,
+    borderRadius: 160,
+    backgroundColor: 'rgba(123, 44, 191, 0.18)',
+    top: -120,
+    right: -130,
+  },
+
+  glowBottom: {
+    position: 'absolute',
+    width: 280,
+    height: 280,
+    borderRadius: 140,
+    backgroundColor: 'rgba(245, 197, 66, 0.10)',
+    bottom: -130,
+    left: -120,
+  },
+
+  card: {
+    backgroundColor: 'rgba(18, 18, 32, 0.96)',
+    borderRadius: 30,
     paddingHorizontal: 24,
-  },
-  logo: {
-    width: 84,
-    height: 84,
-    borderRadius: 42,
-    alignSelf: 'center',
-    backgroundColor: 'rgba(255, 226, 138, 0.12)',
+    paddingTop: 26,
+    paddingBottom: 24,
     borderWidth: 1,
-    borderColor: 'rgba(255, 226, 138, 0.65)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#ffd76a',
-    shadowOpacity: 0.8,
+    borderColor: 'rgba(245, 197, 66, 0.30)',
+    shadowColor: GOLD,
+    shadowOpacity: 0.22,
+    shadowRadius: 22,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 14,
+  },
+
+  logoWrapper: {
+    width: 132,
+    height: 132,
+    borderRadius: 34,
+    alignSelf: 'center',
+    padding: 4,
+    backgroundColor: '#08080F',
+    borderWidth: 2,
+    borderColor: GOLD,
+    shadowColor: GOLD_LIGHT,
+    shadowOpacity: 0.38,
     shadowRadius: 18,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 0 },
+    elevation: 10,
+    overflow: 'hidden',
   },
-  logoText: {
-    color: '#ffe28a',
-    fontSize: 40,
-    fontWeight: '900',
+
+  logo: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 29,
   },
-  brand: {
-    color: '#ffe28a',
-    fontSize: 42,
+
+  title: {
+    color: GOLD_LIGHT,
+    fontSize: 31,
     fontWeight: '900',
     textAlign: 'center',
+    letterSpacing: 3,
     marginTop: 18,
   },
+
   subtitle: {
-    color: '#a99b79',
+    color: '#BDAE8A',
+    fontSize: 14,
     textAlign: 'center',
-    marginTop: 6,
-    marginBottom: 28,
+    marginTop: 7,
+    marginBottom: 27,
+    lineHeight: 20,
+    paddingHorizontal: 8,
   },
-  card: {
-    backgroundColor: 'rgba(18, 17, 28, 0.96)',
-    borderRadius: 28,
-    padding: 22,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 226, 138, 0.18)',
+
+  formSection: {
+    marginBottom: 4,
   },
-  title: {
-    color: '#fff2c2',
-    fontSize: 26,
+
+  inputLabel: {
+    color: '#D8C99D',
+    fontSize: 12,
     fontWeight: '800',
-    marginBottom: 18,
+    marginBottom: 8,
+    marginLeft: 3,
   },
+
   input: {
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    color: '#fff',
-    borderRadius: 18,
+    backgroundColor: '#0B0B14',
+    color: '#FFFFFF',
+    borderRadius: 16,
     paddingHorizontal: 16,
-    paddingVertical: 15,
-    fontSize: 16,
-    marginBottom: 14,
+    paddingVertical: 14,
+    marginBottom: 16,
     borderWidth: 1,
-    borderColor: 'rgba(255, 226, 138, 0.12)',
+    borderColor: 'rgba(245, 197, 66, 0.20)',
+    fontSize: 15,
   },
-  buttonWrap: {
+
+  primaryButton: {
+    backgroundColor: GOLD,
+    minHeight: 54,
     borderRadius: 18,
-    overflow: 'hidden',
-    marginTop: 8,
-  },
-  button: {
-    paddingVertical: 16,
     alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 6,
+    shadowColor: GOLD,
+    shadowOpacity: 0.38,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 8,
   },
-  buttonText: {
-    color: '#170f04',
+
+  primaryButtonPressed: {
+    transform: [{ scale: 0.985 }],
+    opacity: 0.9,
+  },
+
+  disabledButton: {
+    opacity: 0.65,
+  },
+
+  primaryButtonText: {
+    color: '#171000',
     fontSize: 17,
     fontWeight: '900',
   },
-  link: {
-    color: '#9a96a6',
-    textAlign: 'center',
-    marginTop: 20,
-    fontSize: 15,
+
+  dividerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 24,
+    marginBottom: 18,
   },
-  linkGold: {
-    color: '#ffe28a',
-    fontWeight: '800',
+
+  divider: {
+    flex: 1,
+    height: 1,
+    backgroundColor: 'rgba(245, 197, 66, 0.18)',
+  },
+
+  dividerText: {
+    color: '#74694E',
+    fontSize: 9,
+    fontWeight: '900',
+    letterSpacing: 1.3,
+    marginHorizontal: 10,
+  },
+
+  registerButton: {
+    minHeight: 48,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(245, 197, 66, 0.24)',
+    backgroundColor: 'rgba(245, 197, 66, 0.05)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+    paddingHorizontal: 12,
+  },
+
+  registerButtonPressed: {
+    opacity: 0.75,
+  },
+
+  registerText: {
+    color: '#929297',
+    fontSize: 14,
+    fontWeight: '700',
+  },
+
+  goldText: {
+    color: GOLD_LIGHT,
+    fontWeight: '900',
+    fontSize: 14,
+  },
+
+  footerText: {
+    color: '#625D6C',
+    fontSize: 11,
+    fontWeight: '700',
+    textAlign: 'center',
+    marginTop: 18,
   },
 });
