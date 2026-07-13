@@ -7,16 +7,16 @@ import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useState } from 'react';
 import {
-  ActivityIndicator,
-  Alert,
-  Image,
-  Pressable,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
+    ActivityIndicator,
+    Alert,
+    Image,
+    Pressable,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    View,
 } from 'react-native';
 import { supabase } from '../lib/supabase';
 
@@ -361,31 +361,7 @@ export default function ProfileScreen() {
     await Clipboard.setStringAsync(userId);
     Alert.alert('Listo', 'ID copiado');
   };
-  const handleLogout = async () => {
-  Alert.alert(
-    'Cerrar sesión',
-    '¿Seguro que quieres salir de Chattera?',
-    [
-      {
-        text: 'Cancelar',
-        style: 'cancel',
-      },
-      {
-        text: 'Salir',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            await supabase.auth.signOut();
-            router.replace('/login');
-          } catch (error) {
-            console.log('Error cerrando sesión:', error);
-            Alert.alert('Error', 'No se pudo cerrar sesión');
-          }
-        },
-      },
-    ]
-  );
-};
+  
 
   const formatVisitedAgo = (dateString: string) => {
     const date = new Date(dateString);

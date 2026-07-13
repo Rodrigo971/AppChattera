@@ -48,6 +48,10 @@ export default function LoginScreen() {
     }
   };
 
+  const handleForgotPassword = () => {
+    router.push('/forgot-password');
+  };
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -73,6 +77,7 @@ export default function LoginScreen() {
           </View>
 
           <Text style={styles.title}>CHATTERA</Text>
+
           <Text style={styles.subtitle}>
             Entrá a tu cuenta y conectate con tu comunidad
           </Text>
@@ -107,6 +112,19 @@ export default function LoginScreen() {
               onSubmitEditing={handleLogin}
               returnKeyType="done"
             />
+
+            <Pressable
+              style={({ pressed }) => [
+                styles.forgotPasswordButton,
+                pressed && styles.forgotPasswordPressed,
+              ]}
+              onPress={handleForgotPassword}
+              disabled={loading}
+            >
+              <Text style={styles.forgotPasswordText}>
+                ¿Olvidaste tu contraseña?
+              </Text>
+            </Pressable>
           </View>
 
           <Pressable
@@ -125,7 +143,9 @@ export default function LoginScreen() {
 
           <View style={styles.dividerRow}>
             <View style={styles.divider} />
-            <Text style={styles.dividerText}>CHATERA PREMIUM</Text>
+
+            <Text style={styles.dividerText}>CHATTERA PREMIUM</Text>
+
             <View style={styles.divider} />
           </View>
 
@@ -140,6 +160,7 @@ export default function LoginScreen() {
             <Text style={styles.registerText}>
               ¿No tenés una cuenta?
             </Text>
+
             <Text style={styles.goldText}> Crear cuenta</Text>
           </Pressable>
         </View>
@@ -155,7 +176,6 @@ export default function LoginScreen() {
 const GOLD = '#F5C542';
 const GOLD_LIGHT = '#FFD978';
 const DARK = '#08080F';
-const CARD = '#121220';
 
 const styles = StyleSheet.create({
   container: {
@@ -269,6 +289,24 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(245, 197, 66, 0.20)',
     fontSize: 15,
+  },
+
+  forgotPasswordButton: {
+    alignSelf: 'flex-end',
+    paddingVertical: 5,
+    paddingHorizontal: 3,
+    marginTop: -6,
+    marginBottom: 12,
+  },
+
+  forgotPasswordPressed: {
+    opacity: 0.65,
+  },
+
+  forgotPasswordText: {
+    color: GOLD_LIGHT,
+    fontSize: 13,
+    fontWeight: '800',
   },
 
   primaryButton: {
