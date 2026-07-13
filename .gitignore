@@ -47,3 +47,12 @@ credentials.json
 credentials/
 *.jks
 *.keystore
+
+# Android backups
+android-backup/
+
+# Supabase temp
+supabase/.temp/
+
+# Logs
+*.log
